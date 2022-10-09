@@ -1,5 +1,7 @@
 package in.one2n.exercise;
 
+import java.util.Objects;
+
 public class Student {
 
     private String firstname;
@@ -16,21 +18,54 @@ public class Student {
 
     public Student(String firstname, String lastname, String university) {
         // TODO: add your implementation here
+        this.firstname=firstname;
+        this.lastname=lastname;
+        this.university=university;
     }
 
     public Student(String firstname, String lastname, String university, Double test1Score, Double test2Score, Double test3Score, Double test4Score) {
         // TODO: add your implementation here
+        this.firstname=firstname;
+        this.lastname=lastname;
+        this.university=university;
+        this.test1Score=test1Score;
+        this.test2Score=test2Score;
+        this.test3Score=test3Score;
+        this.test4Score=test4Score;
     }
 
     public Double getFinalScore() {
         // TODO: add your implementation here
-        return null;
+        this.finalScore = (test1Score+test2Score+test3Score+test4Score)/4.0;
+        return finalScore;
     }
 
     public Grade getGrade() {
         // TODO: add your implementation here
-        return null;
+
+        if(this.finalScore<35) this.grade=Grade.F;
+        else if(this.finalScore>=35 && this.finalScore<50) this.grade=Grade.C;
+        else if(this.finalScore>=50 && this.finalScore<70) this.grade=Grade.B;
+        else this.grade=Grade.A;
+        return this.grade;
+    }
+    public String getFirstname(){
+        return this.firstname;
     }
 
+    public String getUniversity(){
+        return this.university;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return Objects.equals(firstname, student.firstname) && Objects.equals(lastname, student.lastname) && Objects.equals(university, student.university);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstname, lastname, university);
+    }
 }
 
