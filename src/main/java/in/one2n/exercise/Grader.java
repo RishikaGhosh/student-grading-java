@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Grader {
 
@@ -13,15 +14,12 @@ public class Grader {
     public List<Student> parseCSV(String filepath) {
         // TODO: add your implementation here
         List<Student>students = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(filepath))) {
 
-            //parsing the column headers
+        // try - with resources block
+        try (BufferedReader br = new BufferedReader(new FileReader(filepath))) {
 
             String[] headers = br.readLine().trim().split(",");
             String line;
-
-            //parsing the records and
-            //storing them into a List
 
             while ((line = br.readLine()) != null) {
                 String[] record = line.split(COMMA_DELIMITER);
@@ -35,6 +33,8 @@ public class Grader {
                 students.add(student);
             }
             return students;
+
+
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -48,29 +48,18 @@ public class Grader {
         }
 
         //populating the finalscore and grade fields of class Student
+        //UPDATED with stream
 
-        students.forEach((student)->{
+        students.stream().forEach((student)->{
             student.getFinalScore();
             student.getGrade();
         });
-
         return students;
     }
     public Student findOverallTopper(List<Student> gradedStudents) {
         // TODO: add your implementation here
-        if(gradedStudents.isEmpty()){
-            return null;
-        }
-
-        //finding the max finalscore and its corresponding student
-
-        Student topper = gradedStudents.get(0);
-        for(Integer index = 1; index<gradedStudents.size(); index++){
-            if(gradedStudents.get(index).getFinalScore()>topper.getFinalScore()){
-                topper = gradedStudents.get(index);
-            }
-        }
-        return topper;
+        //UPDATED with streams
+        return gradedStudents.isEmpty()?null:gradedStudents.stream().max(Comparator.comparing(Student::getFinalScore)).get();
     }
 
     public Map<String, Student> findTopperPerUniversity(List<Student> gradedStudents) {
@@ -78,24 +67,14 @@ public class Grader {
         if(gradedStudents.isEmpty()){
             return new HashMap<>();
         }
+
         Map<String, Student> toppers = new HashMap<>();
-        for(Student student: gradedStudents){
 
-            // if the university key is not present
-            //creating a new entry in the hashmap
-
-            if(toppers.get(student.getUniversity())==null) {
-                toppers.put(student.getUniversity(),student);
-            }else{
-
-                //else replacing key's value if it is greater
-                //than the previous one
-
-                if(toppers.get(student.getUniversity()).getFinalScore()<student.getFinalScore()){
-                    toppers.replace(student.getUniversity(),student);
-                }
-            }
-        }
+        //UPDATED using Streams
+        Map<String,List<Student>> students = gradedStudents.stream().collect(Collectors.groupingBy(Student::getUniversity));
+        students.forEach((uni,topper)->{
+            toppers.put(uni,findOverallTopper(topper));
+        });
         return toppers;
     }
 }
